@@ -2,16 +2,7 @@ const fs = require("fs");
 let validate = require("./validation");
 let schema = require('./validationYup');
 
-//valid
-const url1 = "./test/valids/0379c574-3c1d-4c76-b694-589290f709a7.json";
-
-
-//invalid
-const url2 = "./test/invalids/1234.json";
-const url3 = "./test/invalids/22ca4ccf-8d14-4035-9cbb-c1d0aee5ef38.json";
-const url4 = "./test/invalids/2d77b0c6-858f-407f-a518-58371ac9adcb.json";
-const url5 = "./test/invalids/d598e54f-923f-4397-8914-149ee41a7f61.json";
-const url6 = "./test/invalids/efc30e08-49b1-4d1e-a727-a35aecd6468e.json.json";
+url1="./article.json"
 
 //VALIDACION CON YUP
 //
