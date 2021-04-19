@@ -67,4 +67,4 @@ let readPartOne = (url) => {
 });
 };
 
-readPartOne(url1)
+readPartOne(url1);
