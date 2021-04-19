@@ -18,6 +18,9 @@
   },
   "homepage": "https://github.com/Alfopm/proyecto_academy_nuevo#readme",
   "dependencies": {
+    "@rlemiengre/async-read-multiple-json": "^1.0.0",
+    "async": "^3.2.0",
+    "es6-promisify": "^6.1.1",
     "yup": "^0.32.9"
   }
 }
