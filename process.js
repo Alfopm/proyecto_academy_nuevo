@@ -55,10 +55,10 @@ const readBatch = () => {
     if (err) console.log("no se pudo leer", files);
     //console.log(files);
     files.forEach(file => {
-      const camino = './Articles/' + file;
+      const url = './Articles/' + file;
 
       //console.log(camino);
-      fs.readFile(camino, 'utf8', function (err, data) {
+      fs.readFile(url, 'utf8', function (err, data) {
         if (err) console.log('no se pudo leer el archivo');
         else {
           const object = JSON.parse(data);
@@ -93,4 +93,7 @@ const readBatch = () => {
 }
 
 
-readBatch()
+//readBatch()
+
+
+
