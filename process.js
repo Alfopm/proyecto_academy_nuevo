@@ -1,25 +1,57 @@
 const fs = require("fs");
 let validate = require("./validation");
 let schema = require('./validationYup');
+const path = require('path');
+const sourceFile = path.join(__dirname, 'article.json');
 
-url1 = "./article.json"
+let url1 = "./article.json"
 
 //VALIDACION CON YUP
 
 //SYNC 
-// let validateYup = (url) =>{
-//   let data = fs.readFileSync(url, "utf8");
-//     try {
-//       schema.validate(data, {abortEarly: false});
-//       //console.log(true);
-//     } catch (err) {
-//       return false
-//     }
-// }
+let validateYup = (url) => {
+  let data = fs.readFileSync(url, "utf8");
+  try {
+    schema.validate(data, { abortEarly: false });
+    console.log(true);
+  } catch (err) {
+    return false
+  }
+}
 
-// validateYup(url3);
+let validateYupAsinc = (url) => {
 
+  fs.readFile(url, (err, data) => {
+    if (err) {
+      console.error(`Error reading ${sourceFile}: ${err.message}`);
+      process.exit(1);
+    }
+    
+    const jsonData = JSON.stringify(data);
+    //console.log(typeof jsonData);
 
+    schema.validate(jsonData)
+      .then(() => {
+        const line = JSON.stringify(jsonData);
+        fs.appendFile('db.json', { encoding: 'utf-8' }, err => {
+          if (err) {
+            console.error(`Error saving into db: ${err.message}`);
+            process.exit(1);
+          }
+          else console.info('Completed!');
+        });
+      })
+      .catch(err => {
+        console.error(`Validation error: ${err.message}`);
+      });
+  });
+}
+
+validateYupAsinc(url1)
+
+//validateYup(url1);
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 // LECTURA MODULO validation.js
 let readPartOne = (url) => {
   fs.readFile(url, "utf8", (err, jsonString) => {
@@ -38,7 +70,7 @@ let readPartOne = (url) => {
       try {
         fs.appendFileSync('invalids.json', jsonString)
       } catch (error) {
-        console.log("Error", error);
+        console.log("Error", err);
       }
       console.log("End of script");
     }
@@ -47,7 +79,10 @@ let readPartOne = (url) => {
 
 //readPartOne(url1);
 
-let arrayObjRead = [];
+//-------------------------------------------------------------------------------------------------------------------------------
+
+// PROCESO EN LOTES 
+
 const util = require('util')
 const readBatch = () => {
 
@@ -56,7 +91,6 @@ const readBatch = () => {
     //console.log(files);
     files.forEach(file => {
       const url = './Articles/' + file;
-
       //console.log(camino);
       fs.readFile(url, 'utf8', function (err, data) {
         if (err) console.log('no se pudo leer el archivo');
@@ -65,7 +99,6 @@ const readBatch = () => {
           console.log(object);
           if (validate(object)) {
             console.log('se valido!');
-
             fs.appendFile('./db.json', data, function (err, data) {
               if (err) console.log('no se pudo escribir', data);
               else {
@@ -81,14 +114,9 @@ const readBatch = () => {
               }
             })
           }
-
-
         }
-
       })
     })
-
-
   })
 }
 
@@ -97,3 +125,4 @@ const readBatch = () => {
 
 
 
+//module.exports = readPartOne;

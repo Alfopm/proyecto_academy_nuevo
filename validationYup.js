@@ -5,9 +5,7 @@ let https = /https:\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]
 let src = /(ARTICLE | BLOG | TWEET | NEWSPAPER)/;
 
 
-const validateYup = async(data) =>{
-
-      const schema = yup.object().shape({
+const validateYup = yup.object().shape({
         id: yup
           .string("Must be a string")
           .length(36, "Maximum 36 characters")
@@ -45,18 +43,9 @@ const validateYup = async(data) =>{
         source: yup
           .string("must be a string")
           .required("source is required")
-          .matches(/(ARTICLE|BLOG|TWEET|NEWSPAPER)/),
+          .oneOf(['ARTICLE', 'BLOG', 'TWEET', 'NEWSPAPER'])
       });
 
-  const validation = await schema.validate(data, { abortEarly: false })
-  // const mappedErrors = validation.inner.reduce((errors, entry) => {
-  //   return {
-  //     ...errors,
-  //     [entry.path]: entry.message,
-  //   };
-  // }, {})
-
-}
 
 
 module.exports = validateYup;

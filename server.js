@@ -9,9 +9,6 @@ let readJsonDB = () => {
     return objRead
 }
 
-
-
-
 let firstServer = () => {
     let server = http.createServer(function (req, res) {
         let jsonDB = readJsonDB()
