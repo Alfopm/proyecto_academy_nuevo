@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "process": "node process.js",
-    "start" : "server.js"
+    "start": "server.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,7 @@
     "@rlemiengre/async-read-multiple-json": "^1.0.0",
     "async": "^3.2.0",
     "es6-promisify": "^6.1.1",
+    "express": "^4.17.1",
     "yup": "^0.32.9"
   }
 }
