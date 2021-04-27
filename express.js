@@ -54,7 +54,7 @@ let expressServer = () => {
                     fs.appendFileSync('invalids.json', bodyToString)
                 } catch (err) {
                     console.log("Error", err.message);
-                } 
+                }
                 res.status(201).json({
                     status: 'succes',
                     message: 'The article did not meet the requirements, but still it was saved.'
@@ -71,4 +71,101 @@ let expressServer = () => {
     });
 }
 
-expressServer()
+//expressServer()
+
+//---------------------------------------------------------------------------------------------------
+
+// PERSISTENCIA EN MONGODB
+
+const dbClient = require('./db-client');
+const { ObjectId } = require('mongodb');
+const { db } = require('./db-client');
+
+let serverMongo = () => {
+
+    app.get('/articles', async (req, res) => {
+        const db = dbClient.db('academy_alfonsina')
+        db.collection("articles").find({}).toArray(function (err, result) {
+            if (err) {
+                console.log(err.message)
+            };
+            res.send(result);
+            dbClient.close()
+        });
+    })
+    // GET articles/id ------------------------------------------------------------------------------
+    app.get('/articles/:id', async (req, res) => {
+        const id = req.params.id;
+        if (id.length === 24) {
+            const db = dbClient.db('academy_alfonsina')
+            db.collection("articles").find({ "_id": ObjectId(id) }).toArray(function (err, result) {
+                if (err) {
+                    console.log(err.message)
+                    return res.status(400).json({
+                        status: 'error',
+                        error: 'The article does not exist',
+                    });
+                };
+                res.send(result);
+                dbClient.close()
+            })
+        }
+        else {
+            return res.status(400).json({
+                status: 'error',
+                error: 'id must be 36 characters',
+            });
+        }
+    })
+
+    //--------------------------------------------------------------------------------------------------    
+    //POST
+    app.use(bodyParser.json());
+    app.post('/articles', (req, res) => {
+        let body = req.body
+
+        if (!body) {
+            return res.status(400).json({
+                status: 'error',
+                error: 'request body cannot be empty',
+            });
+        }
+        else {
+            let bodyToString = JSON.stringify(body)
+            if (validate(req.body)) {
+
+                try {
+                    const db = dbClient.db('academy_alfonsina')
+                    db.collection("articles").insertOne(body)
+                    //db.close();
+                    
+
+                } catch (err) {
+                    console.error(err.message)
+                    return res.status(404).json({
+                        status: 'error',
+                        error: 'Try later',
+                    })
+                } 
+                return res.status(200).json({
+                        status: 'success',
+                        error: 'Article saved!',
+                    });
+            } else {
+                return res.status(400).json({
+                    status: 'error',
+                    error: 'The article sent does not meet the requirements',
+                });
+            }
+        }
+    })
+
+
+    app.listen(8080, (err) => {
+        if (err) console.log(err.message);
+        else
+            dbClient.connect();
+    })
+}
+
+serverMongo();

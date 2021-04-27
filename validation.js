@@ -149,7 +149,7 @@ let validateId = (obj) => {
   
   // SE EXPORTA MODULO 
   let validate =(obj)=>{
-    if(validateId(obj) && validateTitle(obj) && validateAuthor(obj) && validatemodifiedAt(obj) &&  validatemodifiedAt(obj) && validPublishedAt(obj) && validateUrl(obj) &&validateKeyWords(obj) && validateReadMins(obj) &&validateSource(obj))
+    if(validateTitle(obj) && validateAuthor(obj) && validatemodifiedAt(obj) &&  validatemodifiedAt(obj) && validPublishedAt(obj) && validateUrl(obj) &&validateKeyWords(obj) && validateReadMins(obj) &&validateSource(obj))
     return true;
     else
     return false;

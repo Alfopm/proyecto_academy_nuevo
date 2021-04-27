@@ -5,7 +5,7 @@ let https = /https:\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]
 let src = /(ARTICLE | BLOG | TWEET | NEWSPAPER)/;
 
 
-const validateYup = yup.object().shape({
+const schema = yup.object().shape({
         id: yup
           .string("Must be a string")
           .length(36, "Maximum 36 characters")
@@ -43,9 +43,10 @@ const validateYup = yup.object().shape({
         source: yup
           .string("must be a string")
           .required("source is required")
-          .oneOf(['ARTICLE', 'BLOG', 'TWEET', 'NEWSPAPER'])
+          .matches(/(ARTICLE|BLOG|TWEET|NEWSPAPER)/),
+          //.oneOf(['ARTICLE', 'BLOG', 'TWEET', 'NEWSPAPER'])
       });
 
 
 
-module.exports = validateYup;
+module.exports = schema;
