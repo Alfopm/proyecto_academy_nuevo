@@ -1,55 +1,34 @@
 const fs = require("fs");
 let validate = require("./validation");
 let schema = require('./validationYup');
-const path = require('path');
-const sourceFile = path.join(__dirname, 'article.json');
-
-let url1 = "./article.json"
 
 //VALIDACION CON YUP
 
-//SYNC 
+let url1 = "./article.json"
 let validateYup = (url) => {
-  let data = fs.readFileSync(url, "utf8");
-  try {
-    schema.validate(data, { abortEarly: false });
-    console.log(true);
-  } catch (err) {
-    return false
-  }
-}
-
-let validateYupAsinc = (url) => {
-
   fs.readFile(url, (err, data) => {
     if (err) {
-      console.error(`Error reading ${sourceFile}: ${err.message}`);
-      process.exit(1);
+      console.error(`Could not read file: ${err.message}`);
     }
-    
-    const jsonData = JSON.stringify(data);
-    //console.log(typeof jsonData);
-
-    schema.validate(jsonData)
+    const jsonData = JSON.parse(data);
+    schema.isValid(JSON.parse(data))
       .then(() => {
-        const line = JSON.stringify(jsonData);
-        fs.appendFile('db.json', { encoding: 'utf-8' }, err => {
+        const JsonToString = JSON.stringify(jsonData);
+        fs.appendFile('db.json', JsonToString, "utf8", err => {
           if (err) {
-            console.error(`Error saving into db: ${err.message}`);
-            process.exit(1);
+            console.log(`Could not save into db: ${err.message}`);
+            
           }
-          else console.info('Completed!');
+          else console.info('Saved correctly');
         });
       })
       .catch(err => {
-        console.error(`Validation error: ${err.message}`);
+        console.error(`Error validating: ${err.message}`);
       });
   });
 }
 
-validateYupAsinc(url1)
-
-//validateYup(url1);
+validateYup(url1)
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 // LECTURA MODULO validation.js
@@ -120,9 +99,4 @@ const readBatch = () => {
   })
 }
 
-
 //readBatch()
-
-
-
-//module.exports = readPartOne;
