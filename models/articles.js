@@ -1,9 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-//const Author = mongoose.model('author');
 
 const articleSchema = new Schema({
-
     title: {
         type: String,
         trim: true
@@ -25,12 +23,8 @@ const articleSchema = new Schema({
         trim: true
     },
     author:{
-        type: Array,
-        trim: true
+        type: Schema.Types.ObjectId, ref: "authors"
     },
-    // {
-    //     type: Schema.Types.ObjectId, ref: "authors"
-    // },
     readMins: {
         type: Number,
         trim: true

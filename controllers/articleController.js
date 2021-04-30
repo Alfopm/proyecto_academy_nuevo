@@ -1,18 +1,23 @@
 const schema = require("../validationYup");
 const article = require('../models/articles');
-
+const author = require("../models/author");
+const authorController = require("./authorController");
+const { ObjectID } = require("bson");
 //POST
 exports.newArticle = (req, res, next) => {
     schema.isValid(req.body)
-        .then(() => {
+        .then(async () => {
             const articulo = new article(req.body);
             try {
                 articulo.save();
+                let foundAuthor = await author.findById({ _id: articulo.author })
+                foundAuthor.articles.push(articulo)
+                foundAuthor.save();
                 res.json({
                     mensaje: "the article was succesfully saved"
                 })
             } catch (error) {
-                console.log(error.message)
+                console.log("el error en el post es: ", error.message)
                 res.json({
                     mensaje: "the article was not saved"
                 })
@@ -30,7 +35,6 @@ exports.newArticle = (req, res, next) => {
 
 //GET ALL
 exports.getAll = async (req, res, next) => {
-
     try {
         const articles = await article.find({})
         res.json({
@@ -67,7 +71,7 @@ exports.getById = async (req, res, next) => {
 // PUT
 exports.updatePut = (req, res, next) => {
     schema.isValid(req.body)
-        .then(async() => {
+        .then(async () => {
             try {
                 const updateArticle = await article.findOneAndUpdate({ _id: req.params.id }, req.body, {
                     new: true
@@ -100,7 +104,6 @@ exports.updatePatch = async (req, res, next) => {
         const updatedArticle = await article.findByIdAndUpdate({ _id: req.params.id }, req.body, {
             new: true
         })
-
         res.json({
             message: "succesfully updated",
             data: updatedArticle,
@@ -117,8 +120,17 @@ exports.updatePatch = async (req, res, next) => {
 
 //DELETE
 exports.deleteArticle = async (req, res, next) => {
+    console.log(req.params.id);
     try {
-        await article.remove({ _id: req.params.id }, { new: true })
+
+        let foundArticle = article.findById({ _id: req.params.id })
+       let authorId = foundArticle.author;
+        
+        await article.deleteOne({ _id: req.params.id }, { new: true })
+        
+        let foundAuthor = await author.findById({ _id: authorId })
+        //foundAuthor.update({ $pull: { articles: req.params.id } })
+        //foundAuthor.save();
         res.json({
             message: "The article was successfully deleted",
         })

@@ -7,7 +7,6 @@ exports.newAuthor = async (req, res, next) => {
     if (schema.validate(req.body)) {
         // create new article
         const autor = new author(req.body);
-
         try {
             await autor.save();
             res.json({
@@ -30,7 +29,6 @@ exports.newAuthor = async (req, res, next) => {
 
 // GET ALL
 exports.getAll = async (req, res, next) => {
-
     try {
         const authors = await author.find({})
         res.json({
@@ -48,8 +46,8 @@ exports.getAll = async (req, res, next) => {
 // GET BY ID
 exports.getById = async (req, res, next) => {
     try {
-        const authorById = await author.findById(req.params.id)
-        res.json({
+        const authorById =  await author.findById(req.params.id).populate({path: 'articles', select: 'title'})
+          res.json({
             data: authorById,
         })
     } catch (error) {
@@ -62,7 +60,6 @@ exports.getById = async (req, res, next) => {
 }
 
 // PUT
-
 exports.updatePut = async (req, res, next) => {
     try {
         const validate = await schema.validate(req.body, { abortEarly: false })

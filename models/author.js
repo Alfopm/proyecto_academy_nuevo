@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const authorSchema = new Schema({
-
     name: {
         type: String,
         trim: true
@@ -10,10 +9,8 @@ const authorSchema = new Schema({
     articles: [{
         type: Schema.Types.ObjectId, ref: "articles" 
     }]
-    // {
-    //     type: Array,
-    //     trim: true
-    // }
 })
 
+
+authorSchema.set('toJSON', { virtuals: true })
 module.exports = mongoose.model('authors', authorSchema)
