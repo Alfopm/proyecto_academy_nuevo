@@ -3,6 +3,7 @@ const article = require('../models/articles');
 const author = require("../models/author");
 const authorController = require("./authorController");
 const { ObjectID } = require("bson");
+
 //POST
 exports.newArticle = (req, res, next) => {
     schema.isValid(req.body)
@@ -120,25 +121,30 @@ exports.updatePatch = async (req, res, next) => {
 
 //DELETE
 exports.deleteArticle = async (req, res, next) => {
-    console.log(req.params.id);
     try {
-
-        let foundArticle = article.findById({ _id: req.params.id })
-       let authorId = foundArticle.author;
-        
-        await article.deleteOne({ _id: req.params.id }, { new: true })
-        
+        let foundArticle = await article.findById({ _id: req.params.id })
+        let authorId = foundArticle.author
         let foundAuthor = await author.findById({ _id: authorId })
-        //foundAuthor.update({ $pull: { articles: req.params.id } })
-        //foundAuthor.save();
-        res.json({
-            message: "The article was successfully deleted",
-        })
+        
+        //----------------------------------------------------------------------------------------------------------
+        //SE BORRA ARTICULO Y SE ACTUALIZA ARRAY DE ARTICULOS DEL AUTOR
+        await article.deleteOne({ _id: req.params.id }, { new: true })
+        await foundAuthor.updateOne({ $pull: { articles: req.params.id } })
+        foundAuthor.save();
+        console.log(foundAuthor.articles);
+        //----------------------------------------------------------------------------------------------------------
+        // HTTP RESPONSE
+        res.json({ mensaje: 'El articulo fue eliminado' });
+        res.status(204);
+
     } catch (error) {
-        console.log(error.message);
-        res.json({
-            message: "could not delete the article",
-        })
+        res.status(404);
+        console.log(error);
         next();
     }
-}
+};
+
+
+
+
+

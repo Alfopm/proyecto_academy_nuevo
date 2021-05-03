@@ -12,7 +12,7 @@ const yup = require("yup");
 
 const schema = yup.object().shape({
     name:yup.string().required(),
-    articles: yup.array().of(yup.string())
+    articles: yup.array().of(yup.string()).nullable()
 })
 
 

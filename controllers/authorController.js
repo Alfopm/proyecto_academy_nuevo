@@ -1,36 +1,37 @@
 const schema = require('../validateAuthor');
 const author = require('../models/author');
-
+const article = require('../models/articles');
 //POST AUTHOR
 exports.newAuthor = async (req, res, next) => {
 
-    if (schema.validate(req.body)) {
-        // create new article
-        const autor = new author(req.body);
-        try {
-            await autor.save();
-            res.json({
-                mensaje: "the author was succesfully saved"
-            })
-        } catch (error) {
-            console.error(error)
-            res.json({
-                mensaje: "the author was not saved"
-            })
-            next();
-        }
-    }
-    else {
-        res.json({
-            mensaje: "the request did not meet the requirements"
+    schema.isValid(req.body)
+        .then(async () => {
+            try {
+                const autor = new author(req.body);
+                await autor.save();
+                res.json({
+                    mensaje: "the author was succesfully saved"
+                })
+            } catch (error) {
+                console.error(error)
+                res.json({
+                    mensaje: "the author was not saved"
+                })
+                next();
+            }
         })
-    }
+        .catch(err => {
+            console.error(`Error validating: ${err.message}`);
+            res.json({
+                mensaje: "the request did not meet the requirements"
+            })
+        });
 }
 
 // GET ALL
 exports.getAll = async (req, res, next) => {
     try {
-        const authors = await author.find({})
+        const authors = await author.find({}).populate({ path: 'articles', select: 'title' })
         res.json({
             data: authors,
         })
@@ -46,8 +47,8 @@ exports.getAll = async (req, res, next) => {
 // GET BY ID
 exports.getById = async (req, res, next) => {
     try {
-        const authorById =  await author.findById(req.params.id).populate({path: 'articles', select: 'title'})
-          res.json({
+        const authorById = await author.findById(req.params.id).populate({ path: 'articles', select: 'title' })
+        res.json({
             data: authorById,
         })
     } catch (error) {
@@ -61,31 +62,41 @@ exports.getById = async (req, res, next) => {
 
 // PUT
 exports.updatePut = async (req, res, next) => {
-    try {
-        const validate = await schema.validate(req.body, { abortEarly: false })
-        console.log(validate);
-        if (validate) {
-            const authorUpdate = await author.findByIdAndUpdate({ _id: req.params.id }, req.body, {
-                new: true
-            })
-            res.json({
-                data: authorUpdate,
-            })
-        }
-    } catch (error) {
-        res.status(404);
-        res.json({ mensaje: 'El cambio no es valido' });
-        next();
-    }
-};
 
+    const validate = await schema.isValid(req.body, { abortEarly: false })
+        .then(async () => {
+            try {
+                const authorUpdate = await author.findByIdAndUpdate({ _id: req.params.id }, req.body, {
+                    new: true
+                })
+                res.json({
+                    data: authorUpdate,
+                })
+            }
+            catch (error) {
+                    res.status(404);
+                    res.json({ mensaje: 'El cambio no es valido' });
+                    next();
+                }
+            })
+            .catch(err => {
+                console.error(`Error validating: ${err.message}`);
+                res.json({
+                    mensaje: "the request did not meet the requirements"
+                })
+            });
+}
+    
 // DELETE
 
+//Al eliminar un autor, elimine todos los artículos publicados por el autor.
 exports.deleteAuthor = async (req, res, next) => {
+    console.log(req.params.id);
     try {
-        await author.remove({ _id: req.params.id }, { new: true })
+        await author.deleteOne({ _id: req.params.id }, { new: true })
+        await article.deleteMany({author: req.params.id})
         res.json({
-            message: "The article was successfully deleted",
+            message: "The author was successfully deleted",
         })
     } catch (error) {
         console.log(error.message);
