@@ -14,7 +14,7 @@ module.exports = function () {
     //ARTICLES
     
     //POST
-    router.post('/articles', articleController.newArticle)
+    router.post('/articles', articleController.createArticle)
     //----------------------------------------------------------------------
     // GET ALL
     router.get('/articles', articleController.getAll)
@@ -36,7 +36,7 @@ module.exports = function () {
     //AUTHORS
 
     //POST
-    router.post('/authors', authorController.newAuthor)
+    router.post('/authors', authorController.createAuthor)
     //----------------------------------------------------------------------
     // GET ALL
     router.get('/authors', authorController.getAll)
